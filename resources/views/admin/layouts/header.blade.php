@@ -116,7 +116,7 @@
 				 <a class="dropdown-item" href="{{ route('admin.password.edit') }}"><i class="ti-wallet text-muted mr-2"></i> Changer mon mot de passe</a>
 				 <a class="dropdown-item" href="#"><i class="ti-settings text-muted mr-2"></i> Settings</a>
 				 <div class="dropdown-divider"></div>
-				 <a class="dropdown-item" href="{{ route('admin.logout') }}"><i class="ti-lock text-muted mr-2"></i> Logout</a>
+				 <a class="dropdown-item" href="{{ route('logout') }}"><i class="ti-lock text-muted mr-2"></i> Me déconnecter</a>
 			  </li>
 			</ul>
           </li>	

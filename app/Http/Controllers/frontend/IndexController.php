@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\Category;
+use App\Models\HomeSlider;
+use App\Models\Product;
+use App\Models\Review;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +18,14 @@ class IndexController extends Controller
 {
     public function Index()
     {
-        return view('frontend.index');
+        $allCategories = Category::all();
+        $allSliders = HomeSlider::where('status', 1)->get();
+
+        $new_products = Product::orderBy('id', 'DESC')->limit(6)->get();
+        $hot_deals_products = Product::where('hot_deals', 1)->limit(4)->get();
+        $featured_products = Product::where('featured', 1)->limit(6)->get();
+
+        return view('frontend.index', compact('allSliders', 'allCategories', 'new_products', 'featured_products', 'hot_deals_products'));
     }
 
     public function AuthForms()

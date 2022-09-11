@@ -10,7 +10,7 @@
 </style>
 
 <div style="margin-top: 30px; margin-left: 40px; margin-right: 600px;">
-    <h4 style="background-color: green; padding: 10px; display: inline-block; color: white; margin-top: -10px; margin-bottom: 5px;">Modifier mon profil</h4>
+    <h4 style="background-color: rgb(21, 126, 210); padding: 10px; display: inline-block; color: white; margin-top: -10px; margin-bottom: 5px;">Modifier mon profil</h4>
 
     <form method="post" action="{{ route('user.profile.update') }}" enctype="multipart/form-data">
         @csrf
@@ -29,7 +29,7 @@
 
         <img src="{{ asset('backend/images/no_image.jpg') }}" id="showImage" style="max-height: 100px; margin-top: 10px; margin-bottom: 20px;">
 
-        <button type="submit" class="btn btn-info" style="margin-top: 25px; margin-left: 10px; background-color: green!important; border: none;">Enregistrer les modifications</button>
+        <button type="submit" class="btn btn-info" style="margin-top: 25px; margin-left: 10px; background-color: rgb(21, 126, 210)!important; border: none;">Enregistrer les modifications</button>
     </form>
 </div>
 
