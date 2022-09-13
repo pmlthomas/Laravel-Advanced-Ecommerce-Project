@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -72,16 +72,10 @@
               showCancelButton: true,
               confirmButtonColor: '#3085d6',
               cancelButtonColor: '#d33',
-              confirmButtonText: 'Oui, supprimer!'
+              confirmButtonText: 'Oui, supprimer!',
               }).then((result) => {
-              if (result.isConfirmed) {
-                  window.location.href = link
-                  Swal.fire(
-                  'Supprimé!',
-                  'Suppression effectuée avec succès!',
-                  'success'
-                  )
-              }
+                window.location.href = link
+                swal.close();
               }) 
       });
     });

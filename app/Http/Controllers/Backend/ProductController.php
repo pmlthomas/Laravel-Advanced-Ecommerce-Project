@@ -281,19 +281,4 @@ class ProductController extends Controller
         Product::find($id)->update(['status' => 0]);
         return redirect()->back();
     }
-
-    public function ProductDetailsView($id)
-    {
-        $product = Product::find($id);
-        $hot_deals_products = Product::where('hot_deals', 1)->limit(4)->get();
-        $featured_products = Product::where('featured', 1)->get();
-
-        $multi_images = MultiImage::where('product_id', $id)->limit(4)->get();
-
-        $product_ratings = Review::where('product_id', $id)->get('ranking');
-        $reviews = Review::where('product_id', $id)->get();
-        $ratings_number = count($product_ratings);
-
-        return view('frontend.product_details', compact('product', 'reviews', 'multi_images', 'product_ratings', 'ratings_number', ));
-    }
 }

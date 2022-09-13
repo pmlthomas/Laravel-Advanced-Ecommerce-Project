@@ -4,13 +4,17 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Backend\AdminProfileController;
 use App\Http\Controllers\Backend\BrandController;
 use App\Http\Controllers\Backend\CategoryController;
+use App\Http\Controllers\Backend\CouponController;
 use App\Http\Controllers\Backend\HomeSliderController;
 use App\Http\Controllers\Backend\ProductController;
 use App\Http\Controllers\frontend\IndexController;
 use App\Http\Controllers\Backend\SubCategoryController;
 use App\Http\Controllers\Backend\SubSubCategoryController;
+use App\Http\Controllers\frontend\CartController;
 use App\Http\Controllers\frontend\LanguageController;
 use App\Http\Controllers\frontend\ReviewController;
+use App\Http\Controllers\frontend\WishlistController;
+use App\Models\Wishlist;
 use Illuminate\Support\Facades\Route;
 
 //! Admin Routes
@@ -72,7 +76,7 @@ Route::middleware(['auth', 'isAdmin'])->group(function(){
         Route::get('/admin/sub-sub-category/delete/{id}', 'DeleteSubSubCategory')->name('admin.sub_sub_category.delete');
     });
 
-    //? Product
+    //? Product Backend
     Route::controller(ProductController::class)->group(function(){
         Route::get('/admin/product', 'ProductView')->name('admin.product');
         Route::get('/admin/product/add', 'AddProductPage')->name('admin.product.add');
@@ -86,8 +90,6 @@ Route::middleware(['auth', 'isAdmin'])->group(function(){
     
         Route::get('admin/product/active/{id}', 'ActivateProduct')->name('admin.product.active');
         Route::get('admin/product/inactive/{id}', 'InactivateProduct')->name('admin.product.inactive');
-        
-        Route::get('/product/details/{id}', 'ProductDetailsView')->name('product.details');
     });
 
     //? Home Slider
@@ -101,6 +103,16 @@ Route::middleware(['auth', 'isAdmin'])->group(function(){
 
         Route::get('admin/slider/active/{id}', 'ActivateSlider')->name('admin.slider.active');
         Route::get('admin/slider/inactive/{id}', 'InactivateSlider')->name('admin.slider.inactive');
+    });
+
+    //? Coupons
+    Route::controller(CouponController::class)->group(function(){
+        Route::get('/admin/coupons', 'CouponsView')->name('admin.coupon');
+        Route::get('/admin/coupon/add', 'AddCouponPage')->name('admin.coupon.add');
+        Route::post('/admin/coupon/store', 'StoreCoupon')->name('admin.coupon.store');
+        Route::get('/admin/coupon/edit/{id}', 'EditCouponPage')->name('admin.coupon.edit');
+        Route::post('/admin/coupon/update', 'UpdateCoupon')->name('admin.coupon.update');
+        Route::get('/admin/coupon/delete/{id}', 'DeleteCoupon')->name('admin.coupon.delete');
     });
 });
 
@@ -118,6 +130,11 @@ Route::middleware(['auth', 'isAdmin'])->group(function(){
 
         Route::get('/mot-de-passe/modifier', 'EditPasswordPage')->name('user.password.edit');
         Route::post('/mot-de-passe/update', 'UpdatePassword')->name('user.password.update');
+    
+         //? Product Frontend
+        Route::get('/product/details/{id}/{slug}', 'ProductDetailsView')->name('product.details');
+        Route::get('/sub-sub-category/products/{id}/{slug}', 'SubSubCategoryProducts');
+        Route::get('/sub-category/products/{id}/{slug}', 'SubCategoryProducts');
     });
 
     //? Language
@@ -130,5 +147,25 @@ Route::middleware(['auth', 'isAdmin'])->group(function(){
     Route::controller(ReviewController::class)->group(function(){
         Route::post('/review/store', 'StoreReview')->name('review.store');
     });
+
+    //? Cart
+    Route::middleware('auth')->group(function(){
+        Route::controller(CartController::class)->group(function(){
+            Route::post('/cart/add', 'AddToCart')->name('cart.add');
+            Route::get('/cart/remove/{id}', 'RemoveFromCart')->name('cart.remove');
+
+            Route::get('/my-cart', 'CartPage')->name('cart.page');
+        });
+    });
+
+    //? Wishlist
+    Route::middleware('auth')->group(function(){
+        Route::controller(WishlistController::class)->group(function(){
+            Route::get('/wishlist', 'WishListView')->name('wishlist.view');
+            Route::get('/wishlist/store/{id}', 'StoreWishlist')->name('wishlist.store');
+            Route::get('/wishlist/remove/{id}', 'RemoveWishlist')->name('wishlist.remove');
+        });
+    });
+
     
 

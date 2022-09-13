@@ -31,155 +31,125 @@
     
     
     	<!-- ============================================== HOT DEALS ============================================== -->
-<div class="sidebar-widget hot-deals wow fadeInUp outer-top-vs">
-	<h3 class="section-title">
-		@if(session()->get('language') == 'fr')
-			OFFRES DU MOMENT
-		@else
-			HOT DEALS
-		@endif
-	</h3>
-	<div class="owl-carousel sidebar-carousel custom-carousel owl-theme outer-top-xs">
-		
-														<div class="item">
-					<div class="products">
-						<div class="hot-deal-wrapper">
+		<div class="sidebar-widget outer-bottom-small wow fadeInUp">
+          <h3 class="section-title">
+            @if(session()->get('language') == 'fr')
+              Offres du moment
+            @else
+              Hot deals
+            @endif
+          </h3>
+          <div class="sidebar-widget-body outer-top-xs">
+              
+              @foreach($hot_deals_products as $item)
+                <div class="item">
+                  <div class="products special-product">
+                    <div class="product">
+                      <div class="product-micro">
+                        <div class="row product-micro-row">
+                          <div class="col col-xs-5">
+                            <div class="product-image">
+                              <div class="image"> <a href="{{ route('product.details', ['id' => $item->id, 'slug' => $item->product_slug_fr]) }}"> <img src="{{ asset($item->product_image) }}" alt=""> </a> </div>
+                              <!-- /.image --> 
+                              
+                            </div>
+                            <!-- /.product-image --> 
+                          </div>
+                          <!-- /.col -->
+                          <div class="col col-xs-7">
+                            <div class="product-info">
+                              <h3 class="name"><a href="{{ route('product.details', ['id' => $item->id, 'slug' => $item->product_slug_fr]) }}">
+                                @if(session()->get('language') == 'fr')
+                                  {{ $item->product_name_fr }}
+                                @else
+                                  {{ $item->product_name_en }}
+                                @endif
+                              </a></h3>
+                              
+                              @php
+                                $product_ratings = App\Models\Review::where('product_id', $item->id)->get('ranking');
+                              @endphp
 
-							<!-- <div class="sale-offer-tag"><span>35%<br>off</span></div> -->
-							<div class="timing-wrapper">
-								<div class="box-wrapper">
-									<div class="date box">
-										<span class="key">120</span>
-										<span class="value">Days</span>
-									</div>
-								</div>
-				                
-				                <div class="box-wrapper">
-									<div class="hour box">
-										<span class="key">20</span>
-										<span class="value">HRS</span>
-									</div>
-								</div>
+                              @if(count($product_ratings) > 0)
+                                @php
+                                  $ratings_array = [];
+                                  foreach($product_ratings as $rating) {
+                                    array_push($ratings_array, $rating->ranking);
+                                  }
+                                  $global_rating = array_sum($ratings_array) / count($product_ratings);
+                                @endphp			
 
-				                <div class="box-wrapper">
-									<div class="minutes box">
-										<span class="key">36</span>
-										<span class="value">MINS</span>
-									</div>
-								</div>
+                                @foreach(range(1,5) as $i)
+                                  @if($global_rating >0)
+                                    @if($global_rating >0.5)
+                                      <i class="fa fa-star" style="color: orange"></i>
+                                    @else
+                                      <i class="fa fa-star-half-o" style="color: orange"></i>
+                                    @endif
+                                  @else
+                                    <i class="fa fa-star-o" style="color: orange"></i>
+                                  @endif
+                                  @php 
+                                    $global_rating--;
+                                  @endphp
+                                @endforeach
+                              @else
+                                @if(session()->get('language') == 'fr')
+                                  <p><i class="badge badge-pill">Aucune évaluation</i></p>
+                                @else
+                                  <p><i class="badge badge-pill">No review</i></p>
+                                @endif
+                              @endif
 
-				                <div class="box-wrapper hidden-md">
-									<div class="seconds box">
-										<span class="key">60</span>
-										<span class="value">SEC</span>
-									</div>
-								</div>
-							</div>
-						</div><!-- /.hot-deal-wrapper -->
+                              <div class="product-price"> <span class="price"> 
+                                @if(session()->get('language') == 'fr')
+                                  {{ $item->product_selling_price - $item->product_discount_price }} €
+                                @else
+                                  {{ $item->product_selling_price - $item->product_discount_price }} $
+                                @endif
+                              </span> </div>
+                              <!-- /.product-price --> 
+                              
+                            </div>
+                          </div>
+                          <!-- /.col --> 
+                        </div>
+                        <!-- /.product-micro-row --> 
+                      </div>
+                      <!-- /.product-micro --> 
+                      
+                    </div>
+                    
+                  </div>
+                </div>
+              @endforeach
 
-						@foreach($hot_deals_products as $item)
-							@if($item->id !== $product->id)
-								<div class="product-info text-left m-t-20">
-									<div class="image">
-										<a href="{{ route('product.details', $item->id) }}"><img src="{{ asset($item->product_image) }}" height="180px" width="230px"></a>
-									</div>
-									<h3 class="name"><a href="{{ route('product.details', $item->id) }}">
-										@if(session()->get('language') == 'fr')
-											{{ $item->product_name_fr }}
-										@else
-											{{ $item->product_name_en }}
-										@endif
-									</a></h3>
-
-									@php
-										$ratings = App\Models\Review::where('product_id', $item->id)->get('ranking');
-									@endphp
-
-									<div>
-										@if(count($ratings) > 0)
-											@php
-											$ratings_array = [];
-												foreach($ratings as $rating) {
-													array_push($ratings_array, $rating->ranking);
-												}
-												$average_ranking = array_sum($ratings_array) / count($ratings);
-											@endphp
-
-											@foreach(range(1,5) as $i)
-												@if($average_ranking >0)
-													@if($average_ranking >0.5)
-														<i class="fa fa-star" style="color: orange"></i>
-													@else
-														<i class="fa fa-star-half-o" style="color: orange"></i>
-													@endif
-												@else
-													<i class="fa fa-star-o" style="color: orange"></i>
-												@endif
-												@php 
-													$average_ranking--;
-												@endphp
-											@endforeach
-										@else
-											@if(session()->get('language') == 'fr')
-												<p><i class="badge badge-pill">Aucune évaluation</i></p>
-											@else
-												<p><i class="badge badge-pill">No review</i></p>
-											@endif
-										@endif
-									</div>
-									<div class="product-price">	
-										<span class="price">
-											@if(session()->get('language') == 'fr')
-												{{ $item->product_selling_price - $item->product_discount_price }} €
-											@else
-												{{ $item->product_selling_price - $item->product_discount_price }} $
-											@endif
-										</span>
-											
-										<span class="price-before-discount">
-											@if(session()->get('language') == 'fr')
-												{{ $item->product_selling_price }} €
-											@else
-												{{ $item->product_selling_price }} $
-											@endif
-										</span>					
-									
-									</div><!-- /.product-price -->
-									
-								</div><!-- /.product-info -->
-
-								<div class="cart clearfix animate-effect">
-									<div class="action">
-										
-										<div class="add-cart-button btn-group">
-											<button class="btn btn-primary icon" data-toggle="dropdown" type="button">
-												<i class="fa fa-shopping-cart"></i>													
-											</button>
-											<button class="btn btn-primary cart-btn" type="button">
-												@if(session()->get('language') == 'fr')
-													Ajouter au panier
-												@else
-													Add to cart
-												@endif
-											</button>
-																	
-										</div>
-										
-									</div><!-- /.action -->
-								</div><!-- /.cart -->
-							@endif
-						@endforeach
-
-					</div>	
-					</div>		        
-													
-				
-						
-	    
-    </div><!-- /.sidebar-widget -->
-</div>
+          </div>
+          <!-- /.sidebar-widget-body --> 
+        </div>
+        <!-- /.sidebar-widget --> 
 <!-- ============================================== HOT DEALS: END ============================================== -->					
-
+		<div class="sidebar-widget product-tag wow fadeInUp">
+          <h3 class="section-title">
+		  	@if(session()->get('language') == 'fr')
+				Tag du produit
+			@else
+				Product tag
+			@endif
+		  </h3>
+          <div class="sidebar-widget-body outer-top-xs">
+            <div class="tag-list"> 
+				@if(session()->get('language') == 'fr')
+						<a class="item" title="{{ $product->product_tags_fr }}" href="category.html">{{ $product->product_tags_fr }}</a>
+				@else
+						<a class="item" title="{{ $product->product_tags_en }}" href="category.html">{{ $product->product_tags_en }}</a>
+				@endif
+			</div>
+            <!-- /.tag-list --> 
+          </div>
+          <!-- /.sidebar-widget-body --> 
+        </div>
+        <!-- /.sidebar-widget --> 
 <!-- ============================================== NEWSLETTER ============================================== -->
 <!-- ============================================== NEWSLETTER: END ============================================== -->
 
@@ -293,88 +263,116 @@
 									</div>
 								</div><!-- /.row -->	
 							</div><!-- /.stock-container -->
+											
+								<div class="description-container m-t-20">
+									@if(session()->get('language') == 'fr')
+										{{ $product->product_short_desc_fr }}
+									@else
+										{{ $product->product_short_desc_en }}
+									@endif
+								</div><!-- /.description-container -->
 
-							<div class="description-container m-t-20">
-								@if(session()->get('language') == 'fr')
-									{{ $product->product_short_desc_fr }}
-								@else
-									{{ $product->product_short_desc_en }}
-								@endif
-							</div><!-- /.description-container -->
-
-							<div class="price-container info-container m-t-20">
-								<div class="row">
-									
-
-									<div class="col-sm-6">
-										<div class="price-box">
-											<span class="price">
-												@if(session()->get('language') == 'fr')
-													{{ $product->product_selling_price - $product->product_discount_price }} €
-												@else
-													{{ $product->product_selling_price - $product->product_discount_price }} $
-												@endif
-											</span>
-											<span class="price-strike">
-												@if(session()->get('language') == 'fr')
-													{{ $product->product_selling_price }} €
-												@else
-													{{ $product->product_selling_price }} $
-												@endif
-											</span>
+							<form method="post" action="{{ route('cart.add') }}">
+								@csrf
+								<div style="width: 210px; display: flex; margin-top: 20px;">
+									@if(session()->get('language') == 'fr')
+										<div style="margin-right: 10px;">
+											<select class="form-control unicase-form-control selectpicker" name="color">
+												<option selected disabled>choisissez une couleur</option>
+												@foreach($product_color_fr as $item)
+													<option>{{ $item }}</option>
+												@endforeach
+											</select>
 										</div>
-									</div>
-
-									<div class="col-sm-6">
-										<div class="favorite-button m-t-10">
-											<a class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Wishlist" href="#">
-											    <i class="fa fa-heart"></i>
-											</a>
-											<a class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Add to Compare" href="#">
-											   <i class="fa fa-signal"></i>
-											</a>
-											<a class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="E-mail" href="#">
-											    <i class="fa fa-envelope"></i>
-											</a>
+										<select class="form-control unicase-form-control selectpicker" name="size">
+											<option selected disabled>choisissez une taille</option>
+											@foreach($product_size_fr as $item)
+												<option>{{ $item }}</option>
+											@endforeach
+										</select>
+									@else
+										<div style="margin-right: 10px;">
+											<select class="form-control unicase-form-control selectpicker" name="color">
+												<option selected disabled>choose a color</option>
+												@foreach($product_color_en as $item)
+													<option>{{ $item }}</option>
+												@endforeach
+											</select>
 										</div>
-									</div>
+										<select class="form-control unicase-form-control selectpicker" name="size">
+											<option selected disabled>choose a size</option>
+											@foreach($product_size_en as $item)
+												<option>{{ $item }}</option>
+											@endforeach
+										</select>
+									@endif
+								</div>
 
-								</div><!-- /.row -->
-							</div><!-- /.price-container -->
-
-							<div class="quantity-container info-container">
-								<div class="row">
+								<div class="price-container info-container m-t-20">
+									<div class="row">
 									
-									<div class="col-sm-2">
-										<span class="label">Quantité :</span>
-									</div>
-									
-									<div class="col-sm-2">
-										<div class="cart-quantity">
-											<div class="quant-input">
-								                <div class="arrows">
-								                  <div class="arrow plus gradient"><span class="ir"><i class="icon fa fa-sort-asc"></i></span></div>
-								                  <div class="arrow minus gradient"><span class="ir"><i class="icon fa fa-sort-desc"></i></span></div>
-								                </div>
-								                <input type="text" value="1">
-							              </div>
-							            </div>
-									</div>
+										<div class="col-sm-6">
+											<div class="price-box">
+												<span class="price">
+													@if(session()->get('language') == 'fr')
+														{{ $product->product_selling_price - $product->product_discount_price }} €
+													@else
+														{{ $product->product_selling_price - $product->product_discount_price }} $
+													@endif
+												</span>
+												<span class="price-strike">
+													@if(session()->get('language') == 'fr')
+														{{ $product->product_selling_price }} €
+													@else
+														{{ $product->product_selling_price }} $
+													@endif
+												</span>
+											</div>
+										</div>
 
-									<div class="col-sm-7">
-										<a href="#" class="btn btn-primary"><i class="fa fa-shopping-cart inner-right-vs"></i> 
-											@if(session()->get('language') == 'fr')
-												AJOUTER AU PANIER
-											@else
-												ADD TO CART
-											@endif
-										</a>
-									</div>
+										<div class="col-sm-6">
+											<div class="favorite-button m-t-10">
+												<a class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Wishlist" href="#">
+													<i class="fa fa-heart"></i>
+												</a>
+												<a class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="Add to Compare" href="#">
+												<i class="fa fa-signal"></i>
+												</a>
+												<a class="btn btn-primary" data-toggle="tooltip" data-placement="right" title="E-mail" href="#">
+													<i class="fa fa-envelope"></i>
+												</a>
+											</div>
+										</div>
 
-									
-								</div><!-- /.row -->
-							</div><!-- /.quantity-container -->
+									</div><!-- /.row -->
+								</div><!-- /.price-container -->
 
+								<div class="quantity-container info-container">
+									<div class="row">
+										
+										<div class="col-sm-2">
+											<span class="label">Quantité :</span>
+										</div>
+
+										<div class="col-sm-2">
+											<input type="number" class="form-control" name="chosen_quantity">
+										</div>
+
+										<div class="col-sm-7" style="margin-left: 70px; margin-top: -34px;">
+											<input type="hidden" name="id" id="id" value="{{ $product->id }}">
+											<button class="btn btn-primary" type="submit"><i class="fa fa-shopping-cart inner-right-vs"></i> 
+												@if(session()->get('language') == 'fr')
+													AJOUTER AU PANIER
+												@else
+													ADD TO CART
+												@endif
+											</button>
+										</div>
+
+										
+									</div><!-- /.row -->
+								</div><!-- /.quantity-container -->
+							</form>
 							
 
 							
@@ -551,75 +549,112 @@
 				</div><!-- /.product-tabs -->
 
 				<!-- ============================================== UPSELL PRODUCTS ============================================== -->
-<section class="section featured-product wow fadeInUp">
-	<h3 class="section-title">Offres spéciales</h3>
-	<div class="owl-carousel home-owl-carousel upsell-product custom-carousel owl-theme outer-top-xs">
-	    	
-		<div class="item item-carousel">
-			<div class="products">
+				<div class="more-info-tab clearfix ">
+            <h3 class="new-product-title pull-left">
+				@if(session()->get('language') == 'fr')
+					Produits liés à cet article
+				@else
+					Products linked to this item
+				@endif
+			</h3> 
+          </div>
+          <div class="tab-content outer-top-xs">
+            <div class="tab-pane in active" id="all">
+              <div class="product-slider">
+                <div class="owl-carousel home-owl-carousel custom-carousel owl-theme" data-item="5">
+                
+                  @foreach($related_products as $item)
+					@if($item->id !== $product->id)
+						<div class="item item-carousel">
+						<div class="products">
+							<div class="product">
+							<div class="product-image">
+								<div class="image"> <a href="{{ route('product.details', ['id' => $item->id, 'slug' => $item->product_slug_fr]) }}"><img src="{{ asset($item->product_image) }}" style="height: 100px; width: 120px;"></a> </div>
+								<!-- /.image -->
+								
+								<!-- <div class="tag new"><span>new</span></div> -->
+							</div>
+							<!-- /.product-image -->
+							
+							<div class="product-info text-left">
+								<h3 class="name"><a href="detail.html">{{ $item->product_name_fr }}</a></h3>
+								
+								@php
+									$product_ratings = App\Models\Review::where('product_id', $item->id)->get('ranking');
+								@endphp
 
+								@if(count($product_ratings) > 0)
+								@php
+									$ratings_array = [];
+									foreach($product_ratings as $rating) {
+									array_push($ratings_array, $rating->ranking);
+									}
+									$global_rating = array_sum($ratings_array) / count($product_ratings);
+								@endphp			
 
-	<div class="product">		
-		<div class="product-image">
-			<div class="image">
-				<a href="detail.html"><img  src="assets/images/products/p1.jpg" alt=""></a>
-			</div><!-- /.image -->			
+								@foreach(range(1,5) as $i)
+									@if($global_rating >0)
+									@if($global_rating >0.5)
+										<i class="fa fa-star" style="color: orange"></i>
+									@else
+										<i class="fa fa-star-half-o" style="color: orange"></i>
+									@endif
+									@else
+									<i class="fa fa-star-o" style="color: orange"></i>
+									@endif
+									@php 
+									$global_rating--;
+									@endphp
+								@endforeach
+								@else
+								@if(session()->get('language') == 'fr')
+									<p><i class="badge badge-pill">Aucune évaluation</i></p>
+								@else
+									<p><i class="badge badge-pill">No review</i></p>
+								@endif
+								@endif
 
-			            <div class="tag sale"><span>sale</span></div>            		   
-		</div><!-- /.product-image -->
-			
-		
-		<div class="product-info text-left">
-			<h3 class="name"><a href="detail.html">Floral Print Buttoned</a></h3>
-			<div class="rating rateit-small"></div>
-			<div class="description"></div>
+								<div class="description"></div>
+								<div class="product-price"> <span class="price"> {{ $item->product_selling_price - $item->product_discount_price }} € </span> <span class="price-before-discount">{{ $item->product_selling_price }} €</span> </div>
+								<!-- /.product-price --> 
+								
+							</div>
+							<!-- /.product-info -->
+							<div class="cart clearfix animate-effect">
+								<div class="action">
+								<ul class="list-unstyled">
+									<li class="add-cart-button btn-group">
+									<button data-toggle="tooltip" class="btn btn-primary icon" type="button" title="Add Cart"> <i class="fa fa-shopping-cart"></i> </button>
+									<button class="btn btn-primary cart-btn" type="button">Ajouter au panier</button>
+									</li>
+									<li class="lnk wishlist"> <a data-toggle="tooltip" class="add-to-cart" href="detail.html" title="Wishlist"> <i class="icon fa fa-heart"></i> </a> </li>
+									<li class="lnk"> <a data-toggle="tooltip" class="add-to-cart" href="detail.html" title="Compare"> <i class="fa fa-signal" aria-hidden="true"></i> </a> </li>
+								</ul>
+								</div>
+								<!-- /.action --> 
+							</div>
+							<!-- /.cart --> 
+							</div>
+							<!-- /.product --> 
+							
+						</div>
+						<!-- /.products --> 
+						</div>
+						<!-- /.item -->
+					@endif
+                  @endforeach
 
-			<div class="product-price">	
-				<span class="price">
-					$650.99				</span>
-										     <span class="price-before-discount">$ 800</span>
-									
-			</div><!-- /.product-price -->
-			
-		</div><!-- /.product-info -->
-					<div class="cart clearfix animate-effect">
-				<div class="action">
-					<ul class="list-unstyled">
-						<li class="add-cart-button btn-group">
-							<button class="btn btn-primary icon" data-toggle="dropdown" type="button">
-								<i class="fa fa-shopping-cart"></i>													
-							</button>
-							<button class="btn btn-primary cart-btn" type="button">Add to cart</button>
-													
-						</li>
-	                   
-		                <li class="lnk wishlist">
-							<a class="add-to-cart" href="detail.html" title="Wishlist">
-								 <i class="icon fa fa-heart"></i>
-							</a>
-						</li>
+                </div>
+                <!-- /.home-owl-carousel --> 
+              </div>
+              <!-- /.product-slider --> 
+            </div>
+            <!-- /.tab-pane -->
 
-						<li class="lnk">
-							<a class="add-to-cart" href="detail.html" title="Compare">
-							    <i class="fa fa-signal"></i>
-							</a>
-						</li>
-					</ul>
-				</div><!-- /.action -->
-			</div><!-- /.cart -->
-			</div><!-- /.product -->
-
-
-			</div><!-- /.products -->
-		</div><!-- /.item -->
-	
-		
-			</div><!-- /.home-owl-carousel -->
-</section><!-- /.section -->
 <!-- ============================================== UPSELL PRODUCTS : END ============================================== -->
-			
+		  </div>
 			</div><!-- /.col -->
 			<div class="clearfix"></div>
 		</div><!-- /.row -->
-
+		
 @endsection

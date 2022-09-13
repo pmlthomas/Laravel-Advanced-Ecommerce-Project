@@ -102,9 +102,23 @@
             </span>
           </a>
           <ul class="treeview-menu">
-			<li><a href="{{ route('admin.slider') }}"><i class="ti-more"></i>Sliders</a></li>
-			<li><a href="{{ route('admin.slider.add') }}"><i class="ti-more"></i>Ajouter un Slider</a></li>
-		  </ul>
+			      <li><a href="{{ route('admin.slider') }}"><i class="ti-more"></i>Sliders</a></li>
+			      <li><a href="{{ route('admin.slider.add') }}"><i class="ti-more"></i>Ajouter un Slider</a></li>
+		      </ul>
+        </li> 
+
+        <li class="treeview">
+          <a href="#">
+            <i data-feather="file"></i>
+            <span>Coupons</span>
+            <span class="pull-right-container">
+              <i class="fa fa-angle-right pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{{ route('admin.coupon') }}"><i class="ti-more"></i>Coupons</a></li>
+            <li><a href="{{ route('admin.coupon.add') }}"><i class="ti-more"></i>Ajouter un Coupon</a></li>
+          </ul>
         </li> 
         
       </ul>

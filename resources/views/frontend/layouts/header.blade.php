@@ -9,10 +9,16 @@
       <div class="header-top-inner">
         <div class="cnt-account">
           <ul class="list-unstyled">
-              <!-- <li><a href="#"><i class="icon fa fa-heart"></i>Wishlist</a></li> -->
+              <li><a href="{{ route('wishlist.view') }}"><i class="icon fa fa-heart"></i>
+                @if(session()->get('language') == 'fr')
+                  Favoris
+                @else
+                  Wishlist
+                @endif
+              </a></li>
               <!-- <li><a href="#"><i class="icon fa fa-check"></i>Checkout</a></li> -->
               @auth
-                <li><a href="#"><i class="icon fa fa-shopping-cart"></i>
+                <li><a href="{{ route('cart.page') }}"><i class="icon fa fa-shopping-cart"></i>
                   @if(session()->get('language') == 'fr')
                     Mon panier
                   @else
@@ -93,7 +99,7 @@
           <!-- ============================================================= LOGO : END ============================================================= --> </div>
         <!-- /.logo-holder -->
         
-        <div class="col-xs-12 col-sm-12 col-md-7 top-search-holder"> 
+        <div class="col-xs-12 col-sm-12 col-md-7 top-search-holder"  style="margin-left: -30px;"> 
           <!-- /.contact-row --> 
           <!-- ============================================================= SEARCH AREA ============================================================= -->
           <div class="search-area">
@@ -118,37 +124,48 @@
           <!-- ============================================================= SEARCH AREA : END ============================================================= --> </div>
         <!-- /.top-search-holder -->
         
-        <div class="col-xs-12 col-sm-12 col-md-2 animate-dropdown top-cart-row"> 
+        <div class="col-xs-12 col-sm-12 col-md-2 animate-dropdown top-cart-row" style="margin-left: 30px;"> 
           <!-- ============================================================= SHOPPING CART DROPDOWN ============================================================= -->
           
           <div class="dropdown dropdown-cart"> <a href="#" class="dropdown-toggle lnk-cart" data-toggle="dropdown">
-            <div class="items-cart-inner">
+            <div class="items-cart-inner" style="width: 200px;">
               <div class="basket"> <i class="glyphicon glyphicon-shopping-cart"></i> </div>
-              <div class="basket-item-count"><span class="count">2</span></div>
-              <div class="total-price-basket"> <span class="lbl">cart -</span> <span class="total-price"> <span class="sign">$</span><span class="value">600.00</span> </span> </div>
+              <div class="basket-item-count"><span class="count">{{ Cart::count() }}</span></div>
+              <div class="total-price-basket"> <span class="lbl">panier -</span> <span class="total-price"> <span class="value">{{ Cart::subtotal() - ($item->qty * $item->options->discount) }} €</span> </span> </div>
             </div>
             </a>
             <ul class="dropdown-menu">
               <li>
                 <div class="cart-item product-summary">
-                  <div class="row">
-                    <div class="col-xs-4">
-                      <div class="image"> <a href="detail.html"><img src="assets/images/cart.jpg" alt=""></a> </div>
+
+                  @php
+                    $carts = Cart::content();
+                  @endphp
+
+                  @foreach($carts as $item)
+                    <div class="row">
+                      <div class="col-xs-4">
+                        <div class="image"> <a href="{{ url('/product/details/'.$item->id.'/'.$item->options->slug) }}"><img src="{{ asset($item->options->image) }}" style="height: 40px; width: 50px;"></a> </div>
+                      </div>
+                      <div class="col-xs-7">
+                        <h3 class="name"><a href="{{ url('/product/details/'.$item->id.'/'.$item->options->slug) }}">{{ $item->name}}</a></h3>
+
+                        <div class="price">{{ $item->price }} €</div>
+                      </div>
+                      <div class="col-xs-1 action"> <a href="{{ route('cart.remove', $item->rowId) }}"><i class="fa fa-trash"></i></a></div>
                     </div>
-                    <div class="col-xs-7">
-                      <h3 class="name"><a href="index.php?page-detail">Simple Product</a></h3>
-                      <div class="price">$600.00</div>
-                    </div>
-                    <div class="col-xs-1 action"> <a href="#"><i class="fa fa-trash"></i></a> </div>
-                  </div>
+                  <!-- /.cart-item -->
+                @endforeach
+
                 </div>
-                <!-- /.cart-item -->
+
+
                 <div class="clearfix"></div>
                 <hr>
                 <div class="clearfix cart-total">
-                  <div class="pull-right"> <span class="text">Sub Total :</span><span class='price'>$600.00</span> </div>
+                  <div class="pull-right"> <span class="text">Sous-total :</span><span class='price'>{{ Cart::subtotal() - ($item->qty * $item->options->discount) }} €</span> </div>
                   <div class="clearfix"></div>
-                  <a href="checkout.html" class="btn btn-upper btn-primary btn-block m-t-20">Checkout</a> </div>
+                  <a href="checkout.html" class="btn btn-upper btn-primary btn-block m-t-20">Passer la commande</a> </div>
                 <!-- /.cart-total--> 
                 
               </li>
@@ -204,11 +221,15 @@
                                 @foreach($allSubCategories as $item)
                                   <div class="col-xs-12 col-sm-12 col-md-2 col-menu">
                                     <h2 class="title">
-                                      @if(session()->get('language') == 'fr')
-                                        {{ $item->sub_category_name_fr }}
-                                      @else
-                                        {{ $item->sub_category_name_en }}
-                                      @endif 
+                                        @if(session()->get('language') == 'fr')
+                                          <a href="{{ url('/sub-category/products/'.$item->id.'/'.$item->sub_category_slug_fr) }}">
+                                            {{ $item->sub_category_name_fr }}
+                                          </a>
+                                        @else
+                                          <a href="{{ url('/sub-category/products/'.$item->id.'/'.$item->sub_category_slug_en) }}">
+                                            {{ $item->sub_category_name_en }}
+                                          </a>
+                                        @endif
                                     </h2>
                                     <ul class="links">
                                       @php
@@ -217,13 +238,17 @@
 
                                       <!-- //? Header SubSubCategories -->
                                       @foreach($allSubSubCategories as $item)
-                                        <li><a href="#">
+                                        <li>
                                           @if(session()->get('language') == 'fr')
-                                            {{ $item->sub_sub_category_name_fr }}
+                                            <a href="{{ url('/sub-sub-category/products/'.$item->id.'/'.$item->sub_sub_category_slug_fr) }}">
+                                              {{ $item->sub_sub_category_name_fr }}
+                                            </a>
                                           @else
-                                            {{ $item->sub_sub_category_name_en }}
-                                          @endif 
-                                        </a></li>
+                                            <a href="{{ url('/sub-sub-category/products/'.$item->id.'/'.$item->sub_sub_category_slug_en) }}">
+                                              {{ $item->sub_sub_category_name_en }}
+                                            </a>
+                                          @endif
+                                      </li>
                                       @endforeach
                                     </ul>
                                   </div>
