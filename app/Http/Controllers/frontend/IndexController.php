@@ -10,9 +10,11 @@ use App\Models\MultiImage;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
+use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use Image;
 
 class IndexController extends Controller

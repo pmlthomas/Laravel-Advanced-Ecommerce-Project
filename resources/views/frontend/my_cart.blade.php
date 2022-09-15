@@ -1,6 +1,19 @@
 @extends('frontend.main_master')
 @section('content')
 
+  @php
+    if(count(Cart::content()) > 0) {
+      $total_price = 0;
+      foreach(Cart::content() as $item) {
+          $discounted_price = $item->qty * ($item->price - $item->options->discount);
+          $total_price += $discounted_price;
+      }
+      if(session()->get('coupon_discount')) {
+        $after_coupon_price = $total_price - session()->get('coupon_discount');
+      } 
+    }
+  @endphp
+
   <style>
     th {
       font-size: 1em!important;
@@ -25,6 +38,12 @@
             <div class="shopping-cart-table">
               <h1 class="heading-title">Mon panier</h1>
               <div class="table-responsive">
+
+              @php
+                $carts = Cart::content();
+              @endphp
+
+              @if(count($carts) > 0)
                 <table class="table">
                   <thead>
                     <th>Image</th>
@@ -36,17 +55,11 @@
                     <th>Retirer</th>
                   </thead>
                   <tbody>
-
-                    @php
-                      $carts = Cart::content();
-                    @endphp
-
-                    @if(count($carts) > 0)
                       @foreach($carts as $item)
                         <tr>
                           <td class="col-md-2"><a href="{{ route('product.details', ['id' => $item->id, 'slug' => $item->options->slug]) }}"><img src="{{ asset($item->options->image) }}" style="height: 100px; width: 120px;"></a></td>
                           <td class="col-md-2">
-                            <div class="product-name" style="padding-left: 30px;"><a href="{{ route('product.details', ['id' => $item->id, 'slug' => $item->options->slug]) }}">
+                            <div class="product-name" style="padding-left: 30px; font-size: 1.3em;"><a href="{{ route('product.details', ['id' => $item->id, 'slug' => $item->options->slug]) }}">
                               @if(session()->get('language') == 'fr')
                                   {{ $item->name }}
                               @else
@@ -54,19 +67,12 @@
                               @endif
                             </a></div>
 
-                            <div class="price" style="padding-left: 30px;">
+                            <div class="price" style="padding-left: 30px; font-size: 1.2em;">
                               @if(session()->get('language') == 'fr')
                                   {{ $item->price - $item->options->discount }} €
                               @else
                                   {{ $item->price - $item->options->discount }} $
                               @endif
-                              <span>
-                                @if(session()->get('language') == 'fr')
-                                    {{ $item->price }} €
-                                @else
-                                    {{ $item->price }} $
-                                @endif
-                              </span>
                             </div>
                           </td>
 
@@ -82,8 +88,12 @@
                               <input type="number"class="form-control" name="quantity" value="{{ $item->qty }}" style="width: 50px;">
                           </td>
 
+                          @php
+                            $cart = Cart::get($item->rowId);
+                          @endphp
+
                           <td class="col-md-2" style="padding-left: 70px;">
-                              <h5>{{ Cart::subtotal() - ($item->qty * $item->options->discount) }} €</h5>
+                              <h5 style="font-size: 1.2em;">{{ $item->qty * ($cart->price - $item->options->discount) }} €</h5>
                           </td>
 
 
@@ -93,16 +103,85 @@
                         </tr>
                       @endforeach 
 
-                    @else
-                      <br>
-                        <h5>Vous n'avez aucun produit dans votre panier pour le moment.</h5>
-                    @endif
+                      <table class="table" style="width: 400px!important; margin-left: 700px; margin-bottom: 10px;">
+                        <thead>
+                          <tr>
+                            <th>
+                              <span class="estimate-title">Code de réduction</span>
+                              <p>Entrez votre code de réduction si vous en possédez un..</p>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                              <td>
+                                <form method="post" action="{{ route('coupon.apply') }}">
+                                  @csrf
+                                  <div class="form-group">
+                                    <input type="text" class="form-control unicase-form-control text-input" placeholder="Votre code de réduction.." name="coupon_name">
+                                  </div>
+                                  <div class="clearfix pull-right">
+                                    <button type="submit" class="btn-upper btn btn-primary">APPLIQUER LE CODE DE RÉDUCTION</button>
+                                  </div>
+                                </form>
+                              </td>
+                            </tr>
+                        </tbody><!-- /tbody -->
+                      </table><!-- /table -->
 
+                      <div class="cart-shopping-total" style="width: 400px!important; margin-left: 700px;">
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th>
+                                <div class="cart-sub-total">
+                                  Subtotal<span class="inner-left-md">@if(!empty($total_price)){{ $total_price }} € @endif</span>
+                                </div>
+                                <div class="cart-sub-total" style="margin-left: 55px; margin-top: 15px; margin-bottom: 15px;">
+                                  @if(session()->get('coupon_name'))
+                                    Code de réduction<span class="inner-left-md" style="margin-right: 10px; margin-left: -30px;">{{ session()->get('coupon_name') }}</span>
+                                    <a href="{{ route('coupon.remove') }}"><button><i class="fa fa-times"></i></button></a>
+                                  @endif
+                                </div>
+                                <div class="cart-sub-total" style="margin-left: 10px; margin-top: 15px; margin-bottom: 15px;">
+                                  @if(session()->get('coupon_name'))
+                                    <span style="margin-right: 30px;">Réduction</span><span class="inner-left-md" style="margin-right: 10px; margin-left: -30px;">{{ session()->get('coupon_discount') }} €</span>
+                                  @endif
+                                </div>
+                                <div class="cart-grand-total">
+                                  Grand Total<span class="inner-left-md">
+                                    @if(!empty($after_coupon_price))
+                                      {{ $after_coupon_price }} €
+                                     @else 
+                                      @if(!empty($total_price))
+                                        {{ $total_price }} € 
+                                      @endif 
+                                    @endif
+                                  </span>
+                                </div>
+                              </th>
+                            </tr>
+                          </thead><!-- /thead -->
+                          <tbody>
+                              <tr>
+                                <td>
+                                  <div class="cart-checkout-btn pull-right">
+                                    <a href="{{ route('shipping.form') }}"><button type="submit" class="btn btn-primary checkout-btn">PROCÉDER AU PAIEMENT</button></a>
+                                    <span class="">Checkout with multiples address!</span>
+                                  </div>
+                                </td>
+                              </tr>
+                          </tbody><!-- /tbody -->
+                        </table><!-- /table -->
+                      </div><!-- /.cart-shopping-total -->
                   </tbody>
                 </table>
-              </div>
-            </div>			
-          </div><!-- /.row -->
-        </div>
+              @else
+                <br><h5>Vous n'avez aucun produit dans votre panier pour le moment.</h5>
+              @endif
+            </div>
+          </div>			
+        </div><!-- /.row -->
+      </div>
 
 @endsection

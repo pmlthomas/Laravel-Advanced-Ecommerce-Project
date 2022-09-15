@@ -18,7 +18,7 @@
                         <a href="{{ route('user.profile.edit') }}"><button type="button" class="btn btn-info" style="background-color: rgb(21, 126, 210)!important; border: none; margin-right: 10px;">Modifier mon profil</button></a>
                         <a href="{{ route('user.password.edit') }}"><button type="button" class="btn btn-info" style="background-color: rgb(21, 126, 210)!important; border: none;">Changer mon mot de passe</button></a>
                     </div>
-                    <a href="{{ route('logout') }}"><button type="button" class="btn btn-info" style="background-color: rgb(21, 126, 210)!important; border: none; margin-top: 10px; margin-bottom: -20px;">Me déconnecter</button></a>
+                    <a href="{{ route('logout') }}"><button type="button" class="btn btn-info" style="background-color: red!important; border: none; margin-top: 10px; margin-bottom: -20px;">Me déconnecter</button></a>
                 </div>    
             </div>
         </div>

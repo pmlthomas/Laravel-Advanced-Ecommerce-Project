@@ -1,5 +1,16 @@
 @php
   $allCategories = App\Models\Category::all();
+
+  if(count(Cart::content()) > 0) {
+    $total_price = 0;
+    foreach(Cart::content() as $item) {
+        $price = $item->qty * $item->price;
+        $discount = $item->qty * $item->options->discount;
+        $discounted_price = $price - $discount;
+        $total_price += $discounted_price;
+    } 
+  }
+
 @endphp
 
 <header class="header-style-1"> 
@@ -126,53 +137,52 @@
         
         <div class="col-xs-12 col-sm-12 col-md-2 animate-dropdown top-cart-row" style="margin-left: 30px;"> 
           <!-- ============================================================= SHOPPING CART DROPDOWN ============================================================= -->
-          
-          <div class="dropdown dropdown-cart"> <a href="#" class="dropdown-toggle lnk-cart" data-toggle="dropdown">
-            <div class="items-cart-inner" style="width: 200px;">
-              <div class="basket"> <i class="glyphicon glyphicon-shopping-cart"></i> </div>
-              <div class="basket-item-count"><span class="count">{{ Cart::count() }}</span></div>
-              <div class="total-price-basket"> <span class="lbl">panier -</span> <span class="total-price"> <span class="value">{{ Cart::subtotal() - ($item->qty * $item->options->discount) }} €</span> </span> </div>
-            </div>
-            </a>
-            <ul class="dropdown-menu">
-              <li>
-                <div class="cart-item product-summary">
+          @php
+            $carts = Cart::content();
+          @endphp
+        
+            <div class="dropdown dropdown-cart"> <a href="#" class="dropdown-toggle lnk-cart" data-toggle="dropdown">
+              <div class="items-cart-inner" style="width: 200px;">
+                <div class="basket"> <i class="glyphicon glyphicon-shopping-cart"></i> </div>
+                <div class="basket-item-count"><span class="count">{{ Cart::count() }}</span></div>
+                <div class="total-price-basket"> <span class="lbl">panier -</span> <span class="total-price"> <span class="value">@if(!empty($total_price)){{ $total_price }} € @else 0 € @endif</span> </span> </div>
+              </div>
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                    <div class="cart-item product-summary">
 
-                  @php
-                    $carts = Cart::content();
-                  @endphp
+                        @foreach($carts as $item)
+                          <div class="row">
+                            <div class="col-xs-4">
+                              <div class="image"> <a href="{{ url('/product/details/'.$item->id.'/'.$item->options->slug) }}"><img src="{{ asset($item->options->image) }}" style="height: 40px; width: 50px;"></a> </div>
+                            </div>
+                            <div class="col-xs-7">
+                              <h3 class="name"><a href="{{ url('/product/details/'.$item->id.'/'.$item->options->slug) }}">{{ $item->name}}</a></h3>
+                              <div style="display: flex;">
+                                <div class="price">{{ $item->price - $item->options->discount }} €</div>
+                                <div style="margin-left: 5px;">x{{ $item->qty }}</div>
+                              </div>
+                            </div>
+                            <div class="col-xs-1 action"> <a href="{{ route('cart.remove', $item->rowId) }}"><i class="fa fa-trash"></i></a></div>
+                          </div>
+                        <!-- /.cart-item -->
+                        @endforeach
 
-                  @foreach($carts as $item)
-                    <div class="row">
-                      <div class="col-xs-4">
-                        <div class="image"> <a href="{{ url('/product/details/'.$item->id.'/'.$item->options->slug) }}"><img src="{{ asset($item->options->image) }}" style="height: 40px; width: 50px;"></a> </div>
-                      </div>
-                      <div class="col-xs-7">
-                        <h3 class="name"><a href="{{ url('/product/details/'.$item->id.'/'.$item->options->slug) }}">{{ $item->name}}</a></h3>
-
-                        <div class="price">{{ $item->price }} €</div>
-                      </div>
-                      <div class="col-xs-1 action"> <a href="{{ route('cart.remove', $item->rowId) }}"><i class="fa fa-trash"></i></a></div>
                     </div>
-                  <!-- /.cart-item -->
-                @endforeach
 
-                </div>
-
-
-                <div class="clearfix"></div>
-                <hr>
-                <div class="clearfix cart-total">
-                  <div class="pull-right"> <span class="text">Sous-total :</span><span class='price'>{{ Cart::subtotal() - ($item->qty * $item->options->discount) }} €</span> </div>
-                  <div class="clearfix"></div>
-                  <a href="checkout.html" class="btn btn-upper btn-primary btn-block m-t-20">Passer la commande</a> </div>
-                <!-- /.cart-total--> 
-                
-              </li>
-            </ul>
-            <!-- /.dropdown-menu--> 
-          </div>
-          <!-- /.dropdown-cart --> 
+                    <div class="clearfix"></div>
+                    <hr>
+                    <div class="clearfix cart-total">
+                      <div class="pull-right"> <span class="text">Sous-total :</span><span class='price'>@if(!empty($total_price)){{ $total_price }} € @else 0 € @endif</span> </div>
+                      <div class="clearfix"></div>
+                      <a href="{{ route('shipping.form') }}" class="btn btn-upper btn-primary btn-block m-t-20">Passer la commande</a> </div>
+                    <!-- /.cart-total--> 
+                </li>
+              </ul>
+              <!-- /.dropdown-menu--> 
+            </div>
+            <!-- /.dropdown-cart --> 
           
           <!-- ============================================================= SHOPPING CART DROPDOWN : END============================================================= --> </div>
         <!-- /.top-cart-row --> 

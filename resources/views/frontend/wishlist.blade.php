@@ -1,6 +1,17 @@
 @extends('frontend.main_master')
 @section('content')
 
+  <style>
+    .btn-group.bootstrap-select.form-control.unicase-form-control {
+      margin-bottom: 10px;
+      margin-right: 10px;
+    }
+    #qty {
+      width: 60px;
+      margin-right: 40px;
+    }
+  </style>
+
   <div class="breadcrumb">
     <div class="container">
       <div class="breadcrumb-inner">
@@ -26,6 +37,15 @@
           </div>
           @if(isset($wishlist_products[0]->product_name_fr))
             @foreach($wishlist_products as $item)
+
+              @php
+                $product_color_fr = explode(',', $item->product_color_fr);
+                $product_color_en = explode(',', $item->product_color_en);
+
+                $product_size_fr = explode(',', $item->product_size_fr);
+                $product_size_en = explode(',', $item->product_size_en);
+              @endphp
+              
               <tr>
                 <td class="col-md-2"><a href="{{ route('product.details', ['id' => $item->id, 'slug' => $item->product_slug_fr]) }}"><img src="{{ asset($item->product_image) }}" style="height: 215px; width: 250px;"></a></td>
                 <td class="col-md-7">
@@ -86,12 +106,89 @@
                 <td class="col-md-2">
                   <form method="post" action="{{ route('cart.add') }}">
                     @csrf
+
+                    @if(session()->get('language') == 'fr')
+                      <div style="display: flex;">
+                        <div style="display: flex; flex-direction: column;">
+                          <select class="form-control unicase-form-control selectpicker" name="color">
+                            <option selected disabled>choisissez une couleur</option>
+                            @foreach($product_color_fr as $color)
+                              <option>{{ $color }}</option>
+                            @endforeach
+                          </select>
+                          @error('color')
+                            <span class="text-danger" style="margin-bottom: 5px;">{{ $message }}</span>
+                          @enderror
+                        </div>
+
+                        <div style="display: flex; flex-direction: column;">
+                          <select class="form-control unicase-form-control selectpicker" name="size">
+                            <option selected disabled>choisissez une taille</option>
+                            @foreach($product_size_fr as $size)
+                              <option>{{ $size }}</option>
+                            @endforeach
+                          </select>
+                          @error('size')
+                            <span class="text-danger">{{ $message }}</span>
+                          @enderror
+                        </div>
+                      </div>
+
+                      <div class="col-sm-2" style="margin-right: 15px; margin-top: 6px;">
+                        <span class="label" style="font-size: 1em; color: black;">Quantité :</span>
+                      </div>
+
+                      <div class="col-sm-2">
+                        <input type="number" class="form-control" id="qty" name="chosen_quantity">
+                      </div>
+                      @error('chosen_quantity')
+                        <span class="text-danger">{{ $message }}</span>
+                      @enderror
+                    @else
+                      <div style="display: flex;">
+                        <div style="display: flex; flex-direction: column;">
+                          <select class="form-control unicase-form-control selectpicker" name="color">
+                            <option selected disabled>choisissez une couleur</option>
+                            @foreach($product_color_en as $color)
+                              <option>{{ $color }}</option>
+                            @endforeach
+                          </select>
+                          @error('color')
+                            <span class="text-danger" style="margin-bottom: 5px;">{{ $message }}</span>
+                          @enderror
+                        </div>
+
+                        <div style="display: flex; flex-direction: column;">
+                          <select class="form-control unicase-form-control selectpicker" name="size">
+                            <option selected disabled>choisissez une taille</option>
+                            @foreach($product_size_en as $size)
+                              <option>{{ $size }}</option>
+                            @endforeach
+                          </select>
+                          @error('size')
+                            <span class="text-danger">{{ $message }}</span>
+                          @enderror
+                        </div>
+                      </div>
+
+                      <div class="col-sm-2" style="margin-right: 15px; margin-top: 6px;">
+                        <span class="label" style="font-size: 1em; color: black;">Quantité :</span>
+                      </div>
+
+                      <div class="col-sm-2">
+                        <input type="number" class="form-control" id="qty" name="chosen_quantity">
+                      </div>
+                      @error('chosen_quantity')
+                        <span class="text-danger">{{ $message }}</span>
+                      @enderror
+                    @endif
+
                     <input type="hidden" name="id" id="id" value="{{ $item->id }}">
-                    <button class="btn-upper btn btn-primary">Ajouter au panier</button>
+                    <button class="btn-upper btn btn-primary" style="margin-left: 40px;">Ajouter au panier</button>
                   </form>
                 </td>
                 <td class="col-md-1 close-btn">
-                  <a href="{{ route('wishlist.remove', $item->id) }}" class=""><i class="fa fa-times"></i></a>
+                  <a href="{{ route('wishlist.remove', $item->id) }}" class=""><i class="fa fa-times fa-lg"></i></a>
                 </td>
               </tr>
 

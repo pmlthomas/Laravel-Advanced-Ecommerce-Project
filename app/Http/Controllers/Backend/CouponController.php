@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Coupon;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 
 class CouponController extends Controller
 {
@@ -70,6 +71,26 @@ class CouponController extends Controller
     public function DeleteCoupon($id)
     {
         Coupon::findOrFail($id)->delete();
+        return redirect()->back();
+    }
+
+    public function ApplyCoupon(Request $request)
+    {
+        $coupon = Coupon::where('coupon_name', $request->coupon_name)->get();
+
+        if(!empty($coupon)) {
+            if($coupon[0]->coupon_validity <= Carbon::now()->format('Y/m/d')) {
+                Session::put('coupon_discount', $coupon[0]->coupon_discount);
+                Session::put('coupon_name', $coupon[0]->coupon_name);
+            }
+        }
+        return redirect()->back();
+    }
+
+    public function RemoveCoupon()
+    {
+        Session::remove('coupon_discount');
+        Session::remove('coupon_name');
         return redirect()->back();
     }
 }

@@ -15,8 +15,10 @@ use App\Http\Controllers\frontend\LanguageController;
 use App\Http\Controllers\frontend\ReviewController;
 use App\Http\Controllers\frontend\WishlistController;
 use App\Models\Wishlist;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Models\Order;
+ 
 //! Admin Routes
 Route::middleware(['auth', 'isAdmin'])->group(function(){
 
@@ -113,6 +115,9 @@ Route::middleware(['auth', 'isAdmin'])->group(function(){
         Route::get('/admin/coupon/edit/{id}', 'EditCouponPage')->name('admin.coupon.edit');
         Route::post('/admin/coupon/update', 'UpdateCoupon')->name('admin.coupon.update');
         Route::get('/admin/coupon/delete/{id}', 'DeleteCoupon')->name('admin.coupon.delete');
+
+        Route::post('/coupon/apply', 'ApplyCoupon')->name('coupon.apply');
+        Route::get('/coupon/remove', 'RemoveCoupon')->name('coupon.remove');
     });
 });
 
@@ -151,10 +156,18 @@ Route::middleware(['auth', 'isAdmin'])->group(function(){
     //? Cart
     Route::middleware('auth')->group(function(){
         Route::controller(CartController::class)->group(function(){
+
+            // Header Cart
             Route::post('/cart/add', 'AddToCart')->name('cart.add');
             Route::get('/cart/remove/{id}', 'RemoveFromCart')->name('cart.remove');
 
+            //  My Cart
             Route::get('/my-cart', 'CartPage')->name('cart.page');
+
+            // Shipping and Checkout
+            Route::get('/shipping-details', 'ShippingForm')->name('shipping.form');
+            Route::post('/checkout', 'CheckoutView')->name('checkout.view');
+            Route::get('/payment', 'StripeOrder')->name('stripe.order');
         });
     });
 
@@ -166,6 +179,4 @@ Route::middleware(['auth', 'isAdmin'])->group(function(){
             Route::get('/wishlist/remove/{id}', 'RemoveWishlist')->name('wishlist.remove');
         });
     });
-
-    
 
