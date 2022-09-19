@@ -209,9 +209,13 @@ class IndexController extends Controller
        $price_range = explode(',', $request->price_range);
        $minPrice = $price_range[0];
 <<<<<<< HEAD
+<<<<<<< HEAD
        $maxPrice = $price_range[3];
 =======
        $maxPrice = $price_range[6];
+>>>>>>> testBranch
+=======
+       $maxPrice = $price_range[1];
 >>>>>>> testBranch
 
        $searched_products = Product::where('product_name_fr', 'LIKE', "%$request->search%")->whereBetween('product_selling_price', [$minPrice, $maxPrice])->get();
