@@ -117,6 +117,10 @@ class CartController extends Controller
               $discounted_price = $item->qty * ($item->price - $item->options->discount);
               $total_price += $discounted_price;
         }
+
+        if (session()->get('coupon_discount')) {
+            $total_price = $total_price - session()->get('coupon_discount');
+        }
         
         $order_id = Order::insertGetId([
             'user_id' => Auth::user()->id,
@@ -129,6 +133,7 @@ class CartController extends Controller
             'notes' =>  $shipping['notes'],
             
             'invoice_number' => 'EOS'.mt_rand(100000, 999999),
+            'total_price' => $total_price,
             'order_date' => Carbon::now()->format('d F Y'),
             'order_month' => Carbon::now()->format('F'),
             'order_year' => Carbon::now()->format('Y'),
@@ -154,29 +159,21 @@ class CartController extends Controller
     
         \Stripe\Stripe::setApiKey('sk_test_51LRCAyBA6XPq8iANIynUyVnQg3VLuhzcFhfNuIA7XTINkE6K72xuhB14Dtzb9RJpcGLM69xpBq0c5dicPUqwEQDj00TXvMJePa');   
     
-        if (session()->get('coupon_discount')) {
-            $after_coupon_price = $total_price - session()->get('coupon_discount');
+        if ($total_price <= 0) {
+            $invoice = Order::find($order_id);
+            $emailData = [
+                'invoice_number' => $invoice->invoice_number,
+                'name' => Auth::user()->name,
+            ]; 
+            Mail::to($shipping['email'])->send(new OrderMail($emailData));
+
+            session()->forget('shipping');
+            session()->forget('coupon_name');
+            session()->forget('coupon_discount');
+            Cart::destroy(); 
+
+            return redirect('/');
             
-            if ($after_coupon_price <= 0) {
-                $invoice = Order::find($order_id);
-                $emailData = [
-                    'invoice_number' => $invoice->invoice_number,
-                    'name' => Auth::user()->name,
-                ]; 
-                Mail::to($shipping['email'])->send(new OrderMail($emailData));
-
-                session()->flush();
-                Cart::destroy(); 
-
-                return redirect('/');
-                
-            } else {
-                \Stripe\PaymentIntent::create([
-                    'amount' => (int)$after_coupon_price*100,
-                    'currency' => 'eur',
-                    'metadata' => ['integration_check' => 'accept_a_payment'],
-                ]);
-            }
         } else {
             \Stripe\PaymentIntent::create([
                 'amount' => (int)$total_price*100,
@@ -192,7 +189,9 @@ class CartController extends Controller
         ]; 
         Mail::to($shipping['email'])->send(new OrderMail($emailData));
 
-        session()->flush();
+        session()->forget('shipping');
+        session()->forget('coupon_name');
+        session()->forget('coupon_discount');
         Cart::destroy();
 
         return redirect('/');

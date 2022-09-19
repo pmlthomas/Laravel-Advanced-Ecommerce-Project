@@ -264,10 +264,10 @@ jQuery(function () {
 // Price Slider
 if (jQuery('.price-slider').length > 0) {
     jQuery('.price-slider').slider({
-        min: 100,
-        max: 700,
-        step: 10,
-        value: [200, 500],
+        min: 0,
+        max: 1000,
+        step: 1,
+        value: [0, 1000],
         handle: "square"
 
     });

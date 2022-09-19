@@ -136,10 +136,21 @@ Route::middleware(['auth', 'isAdmin'])->group(function(){
         Route::get('/mot-de-passe/modifier', 'EditPasswordPage')->name('user.password.edit');
         Route::post('/mot-de-passe/update', 'UpdatePassword')->name('user.password.update');
     
+        //? My Orders
+        Route::get('/mes-commandes', 'UserOrders')->name('user.orders');
+        Route::get('/mes-commandes/voir/{id}', 'SeeUserOrders')->name('see.user.orders');
+        Route::get('/invoice/download/{id}', 'DownloadInvoice')->name('download.invoice');
+        
+        Route::post('/commande/annuler', 'CancelOrder')->name('cancel.order');
+
          //? Product Frontend
         Route::get('/product/details/{id}/{slug}', 'ProductDetailsView')->name('product.details');
         Route::get('/sub-sub-category/products/{id}/{slug}', 'SubSubCategoryProducts');
         Route::get('/sub-category/products/{id}/{slug}', 'SubCategoryProducts');
+
+        //? Product Search
+        Route::get('/product/search', 'SearchProduct')->name('product.search');
+        Route::post('product/price-range', 'SortByPrice')->name('product.price.range');
     });
 
     //? Language
@@ -179,4 +190,3 @@ Route::middleware(['auth', 'isAdmin'])->group(function(){
             Route::get('/wishlist/remove/{id}', 'RemoveWishlist')->name('wishlist.remove');
         });
     });
-

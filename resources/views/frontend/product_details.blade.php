@@ -517,6 +517,7 @@
 										@foreach($reviews as $item)
 											<hr>
 											<p>Autheur : {{ $item->author }}</p>
+											<p>{{ \Carbon\Carbon::parse($item->created_at)->diffForHumans() }}</p>
 											@php
 												$rating = $item->ranking;
 											@endphp
@@ -536,6 +537,7 @@
 													@endphp
 												@endforeach
 											</p>
+											<p>Titre : {{ $item->review_title }}</p>
 											<p>Commentaire : {{ $item->comment }}</p>
 											<hr>
 										@endforeach

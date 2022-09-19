@@ -7,9 +7,13 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\HomeSlider;
 use App\Models\MultiImage;
+use App\Models\Order;
+use App\Models\Order_item;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -148,5 +152,68 @@ class IndexController extends Controller
         $product_ratings = Review::where('product_id', $id)->get('ranking');
 
         return view('frontend.sub_sub_category_products', compact('sub_sub_category_products', 'allCategories', 'product_ratings'));
+    }
+
+    public function UserOrders()
+    {
+        $orders = Order::where('user_id', Auth::user()->id)->orderBy('id', 'DESC')->paginate(10); 
+        return view('frontend.user_orders', compact('orders'));
+    }
+
+    public function SeeUserOrders($id)
+    {
+        $order = Order::find($id);
+        $order_items = Order_item::where('order_id', $id)->get();
+
+        return view('frontend.user_see_order', compact('order', 'order_items'));
+    }
+
+    public function DownloadInvoice($id)
+    {
+        $order = Order::find($id);
+        $order_items = Order_item::where('order_id', $id)->get();
+
+        $pdf = Pdf::loadView('frontend.download_invoice', compact('order', 'order_items'))->setPaper('a4')->setOption([
+            'tempDir' => public_path(),
+            'chroot' => public_path(),
+        ]);
+        return $pdf->download('facture.pdf');
+    }
+
+    public function CancelOrder(Request $request)
+    {
+        $order = Order::findOrFail($request->id);
+        $order->update([
+            'cancel_date' => Carbon::now('Europe/Paris')->format('d F Y h:i'),
+            'return_reason' => $request->cancel_reason,
+            'status' => 'Canceled'
+        ]);
+        return redirect('/mes-commandes');
+    }
+
+    public function SearchProduct(Request $request)
+    {
+        $this->validate($request, [
+            'search' => 'required',
+        ]);
+
+        $searched_products = Product::where('product_name_fr', 'LIKE', "%$request->search%")->paginate(6); 
+        $allCategories = Category::all();
+        $search = $request->search;
+
+        return view('frontend.product_search', compact('searched_products', 'allCategories', 'search'));
+    }     
+
+    public function SortByPrice(Request $request)
+    {
+       $price_range = explode(',', $request->price_range);
+       $minPrice = $price_range[0];
+       $maxPrice = $price_range[1];
+
+       $searched_products = Product::where('product_name_fr', 'LIKE', "%$request->search%")->whereBetween('product_selling_price', [$minPrice, $maxPrice])->get();
+       $allCategories = Category::all();
+       $search = $request->search;
+       
+       return view('frontend.product_search', compact('searched_products', 'allCategories', 'search'));
     }
 }
