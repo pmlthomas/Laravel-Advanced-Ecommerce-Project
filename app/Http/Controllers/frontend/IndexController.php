@@ -208,7 +208,7 @@ class IndexController extends Controller
     {
        $price_range = explode(',', $request->price_range);
        $minPrice = $price_range[0];
-       $maxPrice = $price_range[1];
+       $maxPrice = $price_range[13];
 
        $searched_products = Product::where('product_name_fr', 'LIKE', "%$request->search%")->whereBetween('product_selling_price', [$minPrice, $maxPrice])->get();
        $allCategories = Category::all();
